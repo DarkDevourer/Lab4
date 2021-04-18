@@ -13,10 +13,12 @@ int main(int argc, char *argv[])
 	int gamma_pipes[2];
 	char filebuf[BUFSIZ + 1];
 	char gammabuf[BUFSIZ + 1];
+	char tmpbuf[BUFSIZ + 1];
 	pid_t fork_result;
 
 	memset(filebuf, '\0', sizeof(filebuf));
 	memset(gammabuf, '\0', sizeof(gammabuf)); //TODO: ПРОВЕРИТЬ BUFSIZ
+	memset(tmpbuf, '\0', sizeof(tmpbuf)); //TODO: ПРОВЕРИТЬ BUFSIZ
 
 	if ((access(argv[1], F_OK) == -1) || (access(argv[2], F_OK) == -1))
 	{
@@ -38,11 +40,8 @@ int main(int argc, char *argv[])
 	}
 	else if (fork_result == 0)
 	{
-		close(0);
-		dup(file_pipes[0]);
-		close(file_pipes[0]);
-		close(file_pipes[1]);
-		execlp("./rdfiles", "./rdfiles",  argv[1], (char*)0);
+		sprintf(tmpbuf, "%d", file_pipes[1]);
+		execlp("./rdfiles", "./rdfiles",  argv[1], tmpbuf, (char*)0);
 		//execlp("ls", "ls", (char*)0);
 		exit(EXIT_FAILURE);
 
@@ -51,10 +50,13 @@ int main(int argc, char *argv[])
 	{
 		int stat_val;
 		wait(&stat_val);
-		close(file_pipes[1]);
 		data_processed = read(file_pipes[0], filebuf, BUFSIZ);
 		printf("data_processed = %d\n", data_processed);
 	}
+
+	close(file_pipes[0]);
+	close(file_pipes[1]);
+	memset(tmpbuf, '\0', sizeof(tmpbuf)); //TODO: ПРОВЕРИТЬ BUFSIZ
 
 	if (pipe(gamma_pipes) != 0)
 	{
@@ -71,11 +73,8 @@ int main(int argc, char *argv[])
 	}
 	else if (fork_result == 0)
 	{
-		close(0);
-		dup(gamma_pipes[0]);
-		close(gamma_pipes[0]);
-		close(gamma_pipes[1]);
-		execlp("./rdfiles", "./rdfiles",  argv[2], (char*)0);
+		sprintf(tmpbuf, "%d", gamma_pipes[1]);
+		execlp("./rdfiles", "./rdfiles",  argv[2], tmpbuf, (char*)0);
 		//execlp("ls", "ls", (char*)0);
 		exit(EXIT_FAILURE);
 
@@ -84,11 +83,13 @@ int main(int argc, char *argv[])
 	{
 		int stat_val;
 		wait(&stat_val);
-		close(gamma_pipes[1]);
 		data_processed = read(gamma_pipes[0], gammabuf, BUFSIZ);
 		printf("data_processed = %d\n", data_processed);
 	}
 
 	printf("\n%s\n%s", filebuf,gammabuf);
+
+	close(gamma_pipes[0]);
+	close(gamma_pipes[1]);
 	return 0;
 }

@@ -5,6 +5,8 @@
 #include <string.h>
 int main(int argc, char *argv[])
 {
+	int file_descriptor;
+	sscanf(argv[2], "%d", &file_descriptor);
 	int rfile = open(argv[1], O_RDONLY);
 	if (rfile == -1)
 	{
@@ -17,11 +19,11 @@ int main(int argc, char *argv[])
 	{
 		if ((rbytes = read(rfile, &buffer, 1024)) == 1024)
 		{
-			write(0, buffer, 1024);
+			write(file_descriptor, buffer, 1024);
 		}
 		else
 		{
-			write(0, buffer, rbytes);
+			write(file_descriptor, buffer, rbytes);
 			break;
 		}
 	}
