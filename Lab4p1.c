@@ -27,5 +27,6 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
+	close(rfile);
 	return 0;
 }
