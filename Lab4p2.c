@@ -9,13 +9,14 @@
 #include <string.h>
 int main(int argc, char *argv[])
 {
+
 	int file_data;
 	int gamma_data;
 	int file_pipes[2];
 	int gamma_pipes[2];
-	char filebuf[BUFSIZ + 1];
-	char gammabuf[BUFSIZ + 1];
-	char tmpbuf[BUFSIZ + 1];
+	char filebuf[32768];
+	char gammabuf[32768];
+	char tmpbuf[32768];
 	pid_t fork_result;
 
 	memset(filebuf, '\0', sizeof(filebuf));
@@ -52,7 +53,7 @@ int main(int argc, char *argv[])
 	{
 		int stat_val;
 		wait(&stat_val);
-		file_data = read(file_pipes[0], filebuf, BUFSIZ);
+		file_data = read(file_pipes[0], filebuf, 32767);
 	}
 
 	close(file_pipes[0]);
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
 	{
 		int stat_val;
 		wait(&stat_val);
-		gamma_data = read(gamma_pipes[0], gammabuf, BUFSIZ);
+		gamma_data = read(gamma_pipes[0], gammabuf, 32767);
 	}
 
 	memset(tmpbuf, '\0', sizeof(tmpbuf));
