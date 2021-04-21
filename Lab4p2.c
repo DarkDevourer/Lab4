@@ -41,8 +41,6 @@ int main(int argc, char *argv[])
 	}
 	else if (fork_result == 0)
 	{
-		//sprintf(tmpbuf, "%d", file_pipes[1]);
-		//execlp("./rdfiles", "./rdfiles",  argv[1], tmpbuf, (char*)0);
 		close(1);
 		dup(file_pipes[1]);
 		close(file_pipes[0]);
@@ -55,7 +53,6 @@ int main(int argc, char *argv[])
 		int stat_val;
 		wait(&stat_val);
 		file_data = read(file_pipes[0], filebuf, BUFSIZ);
-		//printf("file_data = %d\n", file_data);
 	}
 
 	close(file_pipes[0]);
@@ -76,8 +73,6 @@ int main(int argc, char *argv[])
 	}
 	else if (fork_result == 0)
 	{
-		//sprintf(tmpbuf, "%d", gamma_pipes[1]);
-		//execlp("./rdfiles", "./rdfiles",  argv[2], tmpbuf, (char*)0);
 		close(1);
 		dup(gamma_pipes[1]);
 		close(gamma_pipes[0]);
@@ -90,10 +85,8 @@ int main(int argc, char *argv[])
 		int stat_val;
 		wait(&stat_val);
 		gamma_data = read(gamma_pipes[0], gammabuf, BUFSIZ);
-		//printf("gamma_data = %d\n", gamma_data);
 	}
 
-	//printf("\n%s\n%s", filebuf,gammabuf);
 	memset(tmpbuf, '\0', sizeof(tmpbuf));
 
 	close(gamma_pipes[0]);
