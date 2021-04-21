@@ -5,7 +5,7 @@
 #include <string.h>
 int main(int argc, char *argv[])
 {
-	int file_descriptor;
+	/*int file_descriptor;
 	sscanf(argv[2], "%d", &file_descriptor);
 	int rfile = open(argv[1], O_RDONLY);
 	if (rfile == -1)
@@ -27,6 +27,12 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
-	close(rfile);
+	close(rfile);*/
+	if (access(argv[1], F_OK) == -1)
+	{
+		printf("FILE ISN'T ACCESSABLE!");
+		return -1;
+	}
+	execlp("cat", "cat",  argv[1], (char*)0);
 	return 0;
 }

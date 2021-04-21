@@ -19,8 +19,8 @@ int main(int argc, char *argv[])
 	pid_t fork_result;
 
 	memset(filebuf, '\0', sizeof(filebuf));
-	memset(gammabuf, '\0', sizeof(gammabuf)); //TODO: ПРОВЕРИТЬ BUFSIZ
-	memset(tmpbuf, '\0', sizeof(tmpbuf)); //TODO: ПРОВЕРИТЬ BUFSIZ
+	memset(gammabuf, '\0', sizeof(gammabuf));
+	memset(tmpbuf, '\0', sizeof(tmpbuf));
 
 	if ((access(argv[1], F_OK) == -1) || (access(argv[2], F_OK) == -1) || (argc == 3))
 	{
@@ -36,15 +36,17 @@ int main(int argc, char *argv[])
 	fork_result = fork();
 	if (fork_result == (pid_t)-1)
 	{
-		//printf("CHILD PROCESS COMMITED SUICIDE! SOMEBODY CALL THE POLICE!")
 		printf("FORK FAILED!");
 		return -3;
 	}
 	else if (fork_result == 0)
 	{
-		sprintf(tmpbuf, "%d", file_pipes[1]);
-		execlp("./rdfiles", "./rdfiles",  argv[1], tmpbuf, (char*)0);
-		//execlp("ls", "ls", (char*)0);
+		//sprintf(tmpbuf, "%d", file_pipes[1]);
+		//execlp("./rdfiles", "./rdfiles",  argv[1], tmpbuf, (char*)0);
+		close(1);
+		dup(file_pipes[1]);
+		close(file_pipes[0]);
+		execlp("./rdfiles", "./rdfiles",  argv[1], (char*)0);
 		exit(EXIT_FAILURE);
 
 	}
@@ -58,7 +60,7 @@ int main(int argc, char *argv[])
 
 	close(file_pipes[0]);
 	close(file_pipes[1]);
-	memset(tmpbuf, '\0', sizeof(tmpbuf)); //TODO: ПРОВЕРИТЬ BUFSIZ
+	memset(tmpbuf, '\0', sizeof(tmpbuf));
 
 	if (pipe(gamma_pipes) != 0)
 	{
@@ -69,15 +71,17 @@ int main(int argc, char *argv[])
 	fork_result = fork();
 	if (fork_result == (pid_t)-1)
 	{
-		//printf("CHILD PROCESS COMMITED SUICIDE! SOMEBODY CALL THE POLICE!")
 		printf("FORK FAILED!");
 		return -5;
 	}
 	else if (fork_result == 0)
 	{
-		sprintf(tmpbuf, "%d", gamma_pipes[1]);
-		execlp("./rdfiles", "./rdfiles",  argv[2], tmpbuf, (char*)0);
-		//execlp("ls", "ls", (char*)0);
+		//sprintf(tmpbuf, "%d", gamma_pipes[1]);
+		//execlp("./rdfiles", "./rdfiles",  argv[2], tmpbuf, (char*)0);
+		close(1);
+		dup(gamma_pipes[1]);
+		close(gamma_pipes[0]);
+		execlp("./rdfiles", "./rdfiles",  argv[2], (char*)0);
 		exit(EXIT_FAILURE);
 
 	}
@@ -90,7 +94,7 @@ int main(int argc, char *argv[])
 	}
 
 	//printf("\n%s\n%s", filebuf,gammabuf);
-	memset(tmpbuf, '\0', sizeof(tmpbuf)); //TODO: ПРОВЕРИТЬ BUFSIZ
+	memset(tmpbuf, '\0', sizeof(tmpbuf));
 
 	close(gamma_pipes[0]);
 	close(gamma_pipes[1]);
@@ -105,7 +109,7 @@ int main(int argc, char *argv[])
 				return 0;
 			}
 	}
-	memset(tmpbuf, '\0', sizeof(tmpbuf)); //TODO: ПРОВЕРИТЬ BUFSIZ
+	memset(tmpbuf, '\0', sizeof(tmpbuf));
 
 	int gammized_file = open(argv[3], O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR| S_IWUSR);
 	if(gammized_file == -1)
