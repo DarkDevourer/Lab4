@@ -7,6 +7,9 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+
+#define BUFSIZE 1048575
+
 int main(int argc, char *argv[])
 {
 
@@ -14,16 +17,16 @@ int main(int argc, char *argv[])
 	int gamma_data;
 	int file_pipes[2];
 	int gamma_pipes[2];
-	char filebuf[32768];
-	char gammabuf[32768];
-	char tmpbuf[32768];
+	char filebuf[BUFSIZE+1];
+	char gammabuf[BUFSIZE+1];
+	char tmpbuf[BUFSIZE+1];
 	pid_t fork_result;
 
 	memset(filebuf, '\0', sizeof(filebuf));
 	memset(gammabuf, '\0', sizeof(gammabuf));
 	memset(tmpbuf, '\0', sizeof(tmpbuf));
 
-	if ((access(argv[1], F_OK) == -1) || (access(argv[2], F_OK) == -1) || (argc == 3))
+	if ((argc <= 3) || (access(argv[1], F_OK) == -1) || (access(argv[2], F_OK) == -1))
 	{
 		printf("SOME FILES ARE NOT ACCESSEBLE!\n");
 		return -1;
@@ -53,12 +56,11 @@ int main(int argc, char *argv[])
 	{
 		int stat_val;
 		wait(&stat_val);
-		file_data = read(file_pipes[0], filebuf, 32767);
+		file_data = read(file_pipes[0], filebuf, BUFSIZE);
 	}
 
 	close(file_pipes[0]);
 	close(file_pipes[1]);
-	memset(tmpbuf, '\0', sizeof(tmpbuf));
 
 	if (pipe(gamma_pipes) != 0)
 	{
@@ -85,10 +87,8 @@ int main(int argc, char *argv[])
 	{
 		int stat_val;
 		wait(&stat_val);
-		gamma_data = read(gamma_pipes[0], gammabuf, 32767);
+		gamma_data = read(gamma_pipes[0], gammabuf, BUFSIZE);
 	}
-
-	memset(tmpbuf, '\0', sizeof(tmpbuf));
 
 	close(gamma_pipes[0]);
 	close(gamma_pipes[1]);
